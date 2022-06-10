@@ -17,16 +17,18 @@ console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 })
 
 
-async function run(){
-  try{
+async function run() {
+  try {
     await client.connect();
 
     const serviceCollection = client.db('doctors_portal').collection('services');
 
+    const bookingCollection = client.db('Booking_service').collection('Bookings');
+
     // get all sevice from database
 
     //http://localhost:5000/service
-    app.get('/service', async (req, res) =>{
+    app.get('/service', async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
@@ -34,8 +36,17 @@ async function run(){
       res.send(services);
     })
 
+    //post data to mongodb
+
+    app.post('/booking', async (req, res) => {
+      const data = req.body;
+      const result = await bookingCollection.insertOne(data);
+
+      res.send(result);
+    })
+
   }
-  finally{
+  finally {
     // await client.close();
   }
 
