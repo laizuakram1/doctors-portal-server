@@ -3,6 +3,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000
+
 require('dotenv').config()
 
 
@@ -12,13 +13,34 @@ app.use(express.json())
 
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASS}@cluster0.ehypf.mongodb.net/?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-client.connect(err => {
- 
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
+console.log(uri);
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 })
+
+
+async function run(){
+  try{
+    await client.connect();
+
+    const serviceCollection = client.db('doctors_portal').collection('services');
+
+    // get all sevice from database
+
+    //http://localhost:5000/service
+    app.get('/service', async (req, res) =>{
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const services = await cursor.toArray();
+
+      res.send(services);
+    })
+
+  }
+  finally{
+    // await client.close();
+  }
+
+}
+run().catch(console.dir);
 
 
 
