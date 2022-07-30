@@ -22,8 +22,8 @@ async function run() {
     await client.connect();
 
     const serviceCollection = client.db('doctors_portal').collection('services');
-
     const bookingCollection = client.db('Booking_service').collection('Bookings');
+    const doctorsCollection = client.db('doctors_list').collection('doctors');
 
     // get all sevice from database
 
@@ -44,6 +44,20 @@ async function run() {
 
       res.send(result);
     })
+
+    //get all doctors
+    app.get('/doctors', async (req, res) =>{
+      const limit = Number(req.query.limit);
+      const pageNumber = Number(req.query.pageNumber);
+      console.log(limit, pageNumber);
+
+      const cursor = doctorsCollection.find();
+      const doctors = await cursor.skip(limit * pageNumber).limit(limit).toArray();
+      console.log(cursor);
+
+
+      res.send(doctors);
+    } )
 
   }
   finally {
